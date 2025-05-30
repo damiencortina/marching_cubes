@@ -65,21 +65,28 @@ export function marching_cubes_3d_single_cell(f:LevelFunction, x:number, y:numbe
 }
 
     export function marching_cubes_3d(f:LevelFunction, scene: Scene, xmin=XMIN, xmax=XMAX, ymin=YMIN, ymax=YMAX, zmin=ZMIN, zmax=ZMAX){
-    const mesh = new Mesh("custom", scene);
-    const vertexData = new VertexData();
-    Array.from({length: xmax - xmin + 1}, 
-        (_, index) => xmin + index).forEach((x)=>
-        Array.from({length: ymax - ymin + 1}, 
-            (_, index) => ymin + index).forEach((y)=>
-            Array.from({length: zmax - zmin + 1}, 
-                (_, index) => zmin + index).forEach((z)=>
-                vertexData.positions = [...vertexData.positions ?? [], ...marching_cubes_3d_single_cell(f, x,y,z)]
+    const positions: number[] = [];
+    const xRange = range(xmin, xmax);
+    const yRange = range(ymin, ymax);
+    const zRange = range(zmin, zmax);
+    xRange.forEach((x)=>
+        yRange.forEach((y)=>
+            zRange.forEach((z)=>
+                positions.push(...marching_cubes_3d_single_cell(f, x,y,z))
             )
         )
     )
+    const vertexData = new VertexData();
+    vertexData.positions = positions;
     if(vertexData.positions){
         vertexData.indices = [...Array(vertexData.positions.length/3).keys()]
     }
+    const mesh = new Mesh("custom", scene);
     vertexData.applyToMesh(mesh);
     return mesh
+    }
+
+    function range(from:number, to:number){
+        return Array.from({length: to - from + 1}, 
+        (_, index) => from + index); 
     }
