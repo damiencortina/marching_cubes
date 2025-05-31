@@ -75,7 +75,7 @@ export function marching_cubes_3d_single_cell(
 }
 
 export function marching_cubes_3d(
-    f: LevelFunction,
+    levelFunction: LevelFunction,
     scene: Scene,
     xmin = XMIN,
     xmax = XMAX,
@@ -97,7 +97,11 @@ export function marching_cubes_3d(
                     levelFunctionResult = [
                         ...lastCubeLevelFunctionResult.slice(-4),
                         ...VERTICES.slice(-4).map((vertex) =>
-                            f(x + vertex[0], y + vertex[1], z + vertex[2])
+                            levelFunction(
+                                x + vertex[0],
+                                y + vertex[1],
+                                z + vertex[2]
+                            )
                         ),
                     ];
                     positions.push(
@@ -110,7 +114,11 @@ export function marching_cubes_3d(
                     );
                 } else {
                     levelFunctionResult = VERTICES.map((vertex) =>
-                        f(x + vertex[0], y + vertex[1], z + vertex[2])
+                        levelFunction(
+                            x + vertex[0],
+                            y + vertex[1],
+                            z + vertex[2]
+                        )
                     );
                     positions.push(
                         ...marching_cubes_3d_single_cell(
