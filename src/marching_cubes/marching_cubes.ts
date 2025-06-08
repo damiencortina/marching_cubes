@@ -88,48 +88,26 @@ export function marching_cubes_3d(
     const xRange = range(xmin, xmax);
     const yRange = range(ymin, ymax);
     const zRange = range(zmin, zmax);
+    const firstHalfCubeRange = VERTICES.slice(0, 4);
+    const halfCubeRange = VERTICES.slice(-4);
     xRange.forEach((x) => {
         yRange.forEach((y) => {
-            let lastCubeLevelFunctionResult: number[];
+            let firstHalfCubeResults = firstHalfCubeRange.map((vertex) =>
+                levelFunction(x + vertex[0], y + vertex[1], zmin + vertex[2])
+            );
             zRange.forEach((z) => {
-                let levelFunctionResult = [];
-                if (lastCubeLevelFunctionResult) {
-                    levelFunctionResult = [
-                        ...lastCubeLevelFunctionResult.slice(-4),
-                        ...VERTICES.slice(-4).map((vertex) =>
-                            levelFunction(
-                                x + vertex[0],
-                                y + vertex[1],
-                                z + vertex[2]
-                            )
-                        ),
-                    ];
-                    positions.push(
-                        ...marching_cubes_3d_single_cell(
-                            levelFunctionResult,
-                            x,
-                            y,
-                            z
-                        )
-                    );
-                } else {
-                    levelFunctionResult = VERTICES.map((vertex) =>
-                        levelFunction(
-                            x + vertex[0],
-                            y + vertex[1],
-                            z + vertex[2]
-                        )
-                    );
-                    positions.push(
-                        ...marching_cubes_3d_single_cell(
-                            levelFunctionResult,
-                            x,
-                            y,
-                            z
-                        )
-                    );
-                }
-                lastCubeLevelFunctionResult = levelFunctionResult;
+                const secondHalfCubeResults = halfCubeRange.map((vertex) =>
+                    levelFunction(x + vertex[0], y + vertex[1], z + vertex[2])
+                );
+                positions.push(
+                    ...marching_cubes_3d_single_cell(
+                        [...firstHalfCubeResults, ...secondHalfCubeResults],
+                        x,
+                        y,
+                        z
+                    )
+                );
+                firstHalfCubeResults = secondHalfCubeResults;
             });
         });
     });
