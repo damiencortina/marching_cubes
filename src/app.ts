@@ -7,7 +7,7 @@ import {
     Vector3,
     HemisphericLight,
 } from "@babylonjs/core";
-import { marching_cubes_3d } from "./marching_cubes/marching_cubes";
+import { MarchingCubeGenerator } from "./marching_cubes/MarchingCubeGenerator";
 import { PerlinGenerator } from "./marching_cubes/PerlinGenerator";
 
 class App {
@@ -32,10 +32,11 @@ class App {
         //     );
         // }
         const perlinGenerator = new PerlinGenerator();
-        function noise_level(x: number, y: number, z: number): number {
+        function noiseLevel(x: number, y: number, z: number): number {
             return perlinGenerator.get(x / 20, z / 20) * 10 - y;
         }
-        marching_cubes_3d(noise_level, scene);
+        const marchingCubeGenerator = new MarchingCubeGenerator(80);
+        marchingCubeGenerator.marchingCubes3d(noiseLevel, scene);
 
         const camera: ArcRotateCamera = new ArcRotateCamera(
             "Camera",
