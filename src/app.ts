@@ -8,6 +8,7 @@ import {
     HemisphericLight,
 } from "@babylonjs/core";
 import { marching_cubes_3d } from "./marching_cubes/marching_cubes";
+import { PerlinGenerator } from "./marching_cubes/PerlinGenerator";
 
 class App {
     constructor() {
@@ -24,13 +25,17 @@ class App {
 
         // Generate a sphere with the marching cubes algorhythm
         const SPHERE_RADIUS = 39.5; // Carefull, by default only coordinates from -3 to 3 are evaluated thus a bigger sphere radius might end up in a partially rendered sphere
-        function level(x: number, y: number, z: number): number {
-            return (
-                SPHERE_RADIUS -
-                Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2))
-            );
+        // function sphere_level(x: number, y: number, z: number): number {
+        //     return (
+        //         SPHERE_RADIUS -
+        //         Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2))
+        //     );
+        // }
+        const perlinGenerator = new PerlinGenerator();
+        function noise_level(x: number, y: number, z: number): number {
+            return perlinGenerator.get(x / 20, z / 20) * 10 - y;
         }
-        marching_cubes_3d(level, scene);
+        marching_cubes_3d(noise_level, scene);
 
         const camera: ArcRotateCamera = new ArcRotateCamera(
             "Camera",
