@@ -6,11 +6,12 @@ import {
     Vector3,
     HemisphericLight,
     HavokPlugin,
-    ArcRotateCamera,
+    PhysicsShapeType,
+    PhysicsAggregate,
 } from "@babylonjs/core";
 import { MarchingCubeGenerator } from "./marching_cubes/MarchingCubeGenerator";
 import { PerlinGenerator } from "./marching_cubes/PerlinGenerator";
-import { Player } from "./Player";
+import { initCharacterController } from "./Player";
 import HavokPhysics from "@babylonjs/havok";
 
 class App {
@@ -32,17 +33,7 @@ class App {
             return perlinGenerator.get(x / 20, z / 20) * 10 - y;
         }
         const marchingCubeGenerator = new MarchingCubeGenerator(80);
-        marchingCubeGenerator.marchingCubes3d(noiseLevel, scene);
-
-        const camera: ArcRotateCamera = new ArcRotateCamera(
-            "Camera",
-            Math.PI,
-            -Math.PI / 16,
-            20,
-            Vector3.Zero(),
-            scene
-        );
-        camera.attachControl(canvas, true);
+        const mesh = marchingCubeGenerator.marchingCubes3d(noiseLevel, scene);
 
         new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
 
@@ -59,14 +50,16 @@ class App {
         });
 
         // Initialize Havok plugin
-        this.initPhysics(scene, engine);
+        this.initPhysics(scene, engine, mesh);
     }
 
-    async initPhysics(scene: Scene, engine: Engine) {
+    async initPhysics(scene: Scene, engine: Engine, mesh) {
         const havokInstance = await HavokPhysics();
         const hk = new HavokPlugin(true, havokInstance);
         scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-        new Player(scene);
+        initCharacterController(scene);
+        new PhysicsAggregate(mesh, PhysicsShapeType.MESH);
+
         // run the main render loop
         engine.runRenderLoop(() => {
             scene.render();
