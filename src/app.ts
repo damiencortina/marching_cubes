@@ -12,7 +12,7 @@ import {
 } from "@babylonjs/core";
 import { MarchingCubeGenerator } from "./marching_cubes/MarchingCubeGenerator";
 import { PerlinGenerator } from "./marching_cubes/PerlinGenerator";
-import { initCharacterController } from "./Player";
+import { CharacterController } from "./CharacterController";
 import HavokPhysics from "@babylonjs/havok";
 
 class App {
@@ -58,7 +58,7 @@ class App {
         const havokInstance = await HavokPhysics();
         const hk = new HavokPlugin(true, havokInstance);
         scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-        initCharacterController(scene);
+        new CharacterController(scene);
         new PhysicsAggregate(mesh, PhysicsShapeType.MESH);
 
         // run the main render loop
