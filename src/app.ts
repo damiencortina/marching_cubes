@@ -8,6 +8,7 @@ import {
     HavokPlugin,
     PhysicsShapeType,
     PhysicsAggregate,
+    Mesh,
 } from "@babylonjs/core";
 import { MarchingCubeGenerator } from "./marching_cubes/MarchingCubeGenerator";
 import { PerlinGenerator } from "./marching_cubes/PerlinGenerator";
@@ -53,7 +54,7 @@ class App {
         this.initPhysics(scene, engine, mesh);
     }
 
-    async initPhysics(scene: Scene, engine: Engine, mesh) {
+    async initPhysics(scene: Scene, engine: Engine, mesh: Mesh) {
         const havokInstance = await HavokPhysics();
         const hk = new HavokPlugin(true, havokInstance);
         scene.enablePhysics(new Vector3(0, -9.8, 0), hk);

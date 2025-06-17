@@ -7,6 +7,7 @@ import {
     PointerEventTypes,
     Quaternion,
     Vector3,
+    type CharacterSurfaceInfo,
     type Scene,
 } from "@babylonjs/core";
 
@@ -43,15 +44,8 @@ export function initCharacterController(scene: Scene) {
 
     // State handling
     // depending on character state and support, set the new state
-    const getNextState = function (supportInfo) {
-        if (state == "IN_AIR") {
-            if (
-                supportInfo.supportedState == CharacterSupportedState.SUPPORTED
-            ) {
-                return "ON_GROUND";
-            }
-            return "IN_AIR";
-        } else if (state == "ON_GROUND") {
+    const getNextState = function (supportInfo: CharacterSurfaceInfo) {
+        if (state == "ON_GROUND") {
             if (
                 supportInfo.supportedState != CharacterSupportedState.SUPPORTED
             ) {
@@ -64,16 +58,23 @@ export function initCharacterController(scene: Scene) {
             return "ON_GROUND";
         } else if (state == "START_JUMP") {
             return "IN_AIR";
+        } else {
+            if (
+                supportInfo.supportedState == CharacterSupportedState.SUPPORTED
+            ) {
+                return "ON_GROUND";
+            }
+            return "IN_AIR";
         }
     };
 
     // From aiming direction and state, compute a desired velocity
     // That velocity depends on current state (in air, on ground, jumping, ...) and surface properties
     const getDesiredVelocity = function (
-        deltaTime,
-        supportInfo,
-        characterOrientation,
-        currentVelocity
+        deltaTime: number,
+        supportInfo: CharacterSurfaceInfo,
+        characterOrientation: Quaternion,
+        currentVelocity: Vector3
     ) {
         const nextState = getNextState(supportInfo);
         if (nextState != state) {
@@ -156,7 +157,7 @@ export function initCharacterController(scene: Scene) {
     };
 
     // Display tick update: compute new camera position/target, update the capsule for the character display
-    scene.onBeforeRenderObservable.add((scene) => {
+    scene.onBeforeRenderObservable.add(() => {
         displayCapsule.position.copyFrom(characterController.getPosition());
 
         // camera following
@@ -174,7 +175,7 @@ export function initCharacterController(scene: Scene) {
     });
 
     // After physics update, compute and set new velocity, update the character controller state
-    scene.onAfterPhysicsObservable.add((_) => {
+    scene.onAfterPhysicsObservable.add(() => {
         if (scene.deltaTime == undefined) return;
         const dt = scene.deltaTime / 1000.0;
         if (dt == 0) return;
