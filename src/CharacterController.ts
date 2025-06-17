@@ -83,7 +83,7 @@ export class CharacterController {
                 0,
                 this.#characterOrientation
             );
-            const desiredLinearVelocity = this.getDesiredVelocity(
+            const desiredLinearVelocity = this.#getDesiredVelocity(
                 dt,
                 support,
                 this.#characterOrientation,
@@ -179,7 +179,7 @@ export class CharacterController {
 
     // State handling
     // depending on character state and support, set the new state
-    getNextState(supportInfo: CharacterSurfaceInfo) {
+    #getNextState(supportInfo: CharacterSurfaceInfo) {
         if (this.#state == "ON_GROUND") {
             if (
                 supportInfo.supportedState != CharacterSupportedState.SUPPORTED
@@ -205,13 +205,13 @@ export class CharacterController {
 
     // From aiming direction and state, compute a desired velocity
     // That velocity depends on current state (in air, on ground, jumping, ...) and surface properties
-    getDesiredVelocity(
+    #getDesiredVelocity(
         deltaTime: number,
         supportInfo: CharacterSurfaceInfo,
         characterOrientation: Quaternion,
         currentVelocity: Vector3
     ) {
-        const nextState = this.getNextState(supportInfo);
+        const nextState = this.#getNextState(supportInfo);
         if (nextState != this.#state) {
             this.#state = nextState;
         }
