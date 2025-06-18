@@ -27,7 +27,8 @@
             "extensions": [
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode",
-                "seatonjiang.gitmoji-vscode"
+                "seatonjiang.gitmoji-vscode",
+                "firefox-devtools.vscode-firefox-debug"
             ]
         }
     }
