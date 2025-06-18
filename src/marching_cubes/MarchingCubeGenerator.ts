@@ -1,4 +1,10 @@
-import { Mesh, Scene, VertexData, type FloatArray } from "@babylonjs/core";
+import {
+    Mesh,
+    Scene,
+    Vector3,
+    VertexData,
+    type FloatArray,
+} from "@babylonjs/core";
 import { LOOKUP_TABLE } from "./marching_cubes_consts/lookupTable";
 import { EDGES } from "./marching_cubes_consts/edges";
 import { VERTICES } from "./marching_cubes_consts/vertices";
@@ -6,20 +12,10 @@ import { VERTICES } from "./marching_cubes_consts/vertices";
 type LevelFunction = (x: number, y: number, z: number) => number;
 
 export class MarchingCubeGenerator {
-    xmin: number;
-    ymin: number;
-    zmin: number;
-    xmax: number;
-    ymax: number;
-    zmax: number;
+    chunkSize: number;
 
-    constructor(size: number) {
-        this.xmin = -size / 2;
-        this.xmax = size / 2;
-        this.ymin = -size / 2;
-        this.ymax = size / 2;
-        this.zmin = -size / 2;
-        this.zmax = size / 2;
+    constructor(chunkSize: number) {
+        this.chunkSize = chunkSize;
     }
 
     marchingCubes3dSingleCell(
@@ -58,11 +54,22 @@ export class MarchingCubeGenerator {
         return vertices;
     }
 
-    marchingCubes3d(levelFunction: LevelFunction, scene: Scene) {
+    marchingCubes3d(
+        levelFunction: LevelFunction,
+        scene: Scene,
+        chunkCoordinates: Vector3
+    ) {
+        const halfChunkSize = this.chunkSize / 2;
+        const xmin = chunkCoordinates.x - halfChunkSize;
+        const xmax = chunkCoordinates.x + halfChunkSize;
+        const ymin = -halfChunkSize;
+        const ymax = halfChunkSize;
+        const zmin = chunkCoordinates.z - halfChunkSize;
+        const zmax = chunkCoordinates.z + halfChunkSize;
         const positions: number[] = [];
-        const xRange = MarchingCubeGenerator.range(this.xmin, this.xmax);
-        const yRange = MarchingCubeGenerator.range(this.ymin, this.ymax);
-        const zRange = MarchingCubeGenerator.range(this.zmin, this.zmax);
+        const xRange = MarchingCubeGenerator.range(xmin, xmax);
+        const yRange = MarchingCubeGenerator.range(ymin, ymax);
+        const zRange = MarchingCubeGenerator.range(zmin, zmax);
         const firstHalfCubeRange = VERTICES.slice(0, 4);
         const halfCubeRange = VERTICES.slice(-4);
         xRange.forEach((x) => {
@@ -71,7 +78,7 @@ export class MarchingCubeGenerator {
                     levelFunction(
                         x + vertex[0],
                         y + vertex[1],
-                        this.zmin + vertex[2]
+                        zmin + vertex[2]
                     )
                 );
                 zRange.forEach((z) => {

@@ -16,6 +16,8 @@ import { CharacterController } from "./CharacterController";
 import HavokPhysics from "@babylonjs/havok";
 
 class App {
+    chunkSize = 80;
+
     constructor() {
         // create the canvas html element and attach it to the webpage
         const canvas = document.createElement("canvas");
@@ -33,8 +35,12 @@ class App {
         function noiseLevel(x: number, y: number, z: number): number {
             return perlinGenerator.get(x / 20, z / 20) * 10 - y;
         }
-        const marchingCubeGenerator = new MarchingCubeGenerator(80);
-        const mesh = marchingCubeGenerator.marchingCubes3d(noiseLevel, scene);
+        const marchingCubeGenerator = new MarchingCubeGenerator(this.chunkSize);
+        const mesh = marchingCubeGenerator.marchingCubes3d(
+            noiseLevel,
+            scene,
+            new Vector3()
+        );
 
         new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
 
