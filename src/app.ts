@@ -11,9 +11,11 @@ import {
     Mesh,
 } from "@babylonjs/core";
 import { MarchingCubeGenerator } from "./marching_cubes/MarchingCubeGenerator";
-import { PerlinGenerator } from "./marching_cubes/PerlinGenerator";
 import { CharacterController } from "./CharacterController";
 import HavokPhysics from "@babylonjs/havok";
+// TODO : find a cleaner way to fix that error
+// @ts-expect-error fastnoise-lite is not written in typescript
+import FastNoiseLite from "fastnoise-lite";
 
 class App {
     chunkSize = 80;
@@ -31,9 +33,10 @@ class App {
         const engine = new Engine(canvas, true);
         const scene = new Scene(engine);
 
-        const perlinGenerator = new PerlinGenerator();
+        const noise = new FastNoiseLite();
+        noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
         function noiseLevel(x: number, y: number, z: number): number {
-            return perlinGenerator.get(x / 20, z / 20) * 10 - y;
+            return noise.GetNoise(x, z) * 10 - y;
         }
         const marchingCubeGenerator = new MarchingCubeGenerator(this.chunkSize);
         const mesh = marchingCubeGenerator.marchingCubes3d(
