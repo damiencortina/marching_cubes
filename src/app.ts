@@ -39,9 +39,8 @@ class App {
         const havokInstance = await HavokPhysics();
         const hk = new HavokPlugin(true, havokInstance);
         scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-        const worldBuilder = new StandardMarchingCubesWorld(scene);
-        const chunk = worldBuilder.createChunk(new Vector3(0, 0, 0));
-        chunk.render();
+        const worldBuilder = new StandardMarchingCubesWorld(80, scene);
+        worldBuilder.generateworld();
         const characterController = new CharacterController(scene);
         characterController.attach(worldBuilder);
 
