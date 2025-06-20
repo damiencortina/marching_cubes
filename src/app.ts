@@ -3,7 +3,7 @@ import "@babylonjs/inspector";
 import { Engine, Scene, Vector3, HavokPlugin } from "@babylonjs/core";
 import { CharacterController } from "./CharacterController";
 import HavokPhysics from "@babylonjs/havok";
-import { WorldBuilder } from "./WorldBuilder";
+import { StandardMarchingCubesWorld } from "./World/World/StandardMarchingCubesWorld";
 
 class App {
     constructor() {
@@ -39,7 +39,9 @@ class App {
         const havokInstance = await HavokPhysics();
         const hk = new HavokPlugin(true, havokInstance);
         scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-        const worldBuilder = new WorldBuilder(scene);
+        const worldBuilder = new StandardMarchingCubesWorld(scene);
+        const chunk = worldBuilder.createChunk(new Vector3(0, 0, 0));
+        chunk.render();
         const characterController = new CharacterController(scene);
         characterController.attach(worldBuilder);
 
