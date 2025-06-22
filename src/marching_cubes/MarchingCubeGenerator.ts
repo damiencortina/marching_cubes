@@ -8,6 +8,7 @@ import {
 import { LOOKUP_TABLE } from "./marching_cubes_consts/lookupTable";
 import { EDGES } from "./marching_cubes_consts/edges";
 import { VERTICES } from "./marching_cubes_consts/vertices";
+import { Utils } from "../Utils";
 
 type LevelFunction = (x: number, y: number, z: number) => number;
 
@@ -60,16 +61,16 @@ export class MarchingCubeGenerator {
         chunkCoordinates: Vector3
     ) {
         const halfChunkSize = this.chunkSize / 2;
-        const xmin = chunkCoordinates.x - halfChunkSize;
-        const xmax = chunkCoordinates.x + halfChunkSize;
+        const xmin = chunkCoordinates.x * this.chunkSize - halfChunkSize;
+        const xmax = chunkCoordinates.x * this.chunkSize + halfChunkSize;
         const ymin = -halfChunkSize;
         const ymax = halfChunkSize;
-        const zmin = chunkCoordinates.z - halfChunkSize;
-        const zmax = chunkCoordinates.z + halfChunkSize;
+        const zmin = chunkCoordinates.z * this.chunkSize - halfChunkSize;
+        const zmax = chunkCoordinates.z * this.chunkSize + halfChunkSize;
         const positions: number[] = [];
-        const xRange = MarchingCubeGenerator.range(xmin, xmax);
-        const yRange = MarchingCubeGenerator.range(ymin, ymax);
-        const zRange = MarchingCubeGenerator.range(zmin, zmax);
+        const xRange = Utils.range(xmin, xmax);
+        const yRange = Utils.range(ymin, ymax);
+        const zRange = Utils.range(zmin, zmax);
         const firstHalfCubeRange = VERTICES.slice(0, 4);
         const halfCubeRange = VERTICES.slice(-4);
         xRange.forEach((x) => {
@@ -111,12 +112,5 @@ export class MarchingCubeGenerator {
         const mesh = new Mesh("custom", scene);
         vertexData.applyToMesh(mesh);
         return mesh;
-    }
-
-    static range(from: number, to: number) {
-        return Array.from(
-            { length: to - from + 1 },
-            (_, index) => from + index
-        );
     }
 }

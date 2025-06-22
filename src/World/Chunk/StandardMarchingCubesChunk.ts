@@ -29,7 +29,7 @@ export class StandardMarchingCubesChunk implements Chunk {
         const mesh = marchingCubeGenerator.marchingCubes3d(
             (x: number, y: number, z: number) => noise.GetNoise(x, z) * 10 - y,
             this.scene,
-            new Vector3()
+            this.coordinates
         );
         new PhysicsAggregate(mesh, PhysicsShapeType.MESH);
         return mesh;
