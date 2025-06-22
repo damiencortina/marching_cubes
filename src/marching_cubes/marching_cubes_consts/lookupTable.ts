@@ -1,3 +1,6 @@
+// Each element represents a cube configuration that depends on the result of the level function for each of the cube's vertices
+// (what vertices returns a positive value and what vertices returns a negative vale)
+// Each subelement details the list of edges that should be splitted by a triangle
 export const LOOKUP_TABLE = [[],
 [[8, 0, 3]],
 [[1, 0, 9]],

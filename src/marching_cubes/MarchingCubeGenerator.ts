@@ -25,30 +25,43 @@ export class MarchingCubeGenerator {
         y: number,
         z: number
     ) {
+        // Each of the cube's vertices index that returns a positive result with the level function is squared and added
+        // The result is a representation of the faces that needs to be drawn inside the cube
         const faces =
             LOOKUP_TABLE[
                 levelFunctionResult.reduce(
-                    (acc: number, level: number, index) =>
-                        acc + (level > 0 ? Math.pow(2, index) : 0),
+                    (
+                        lookupTableCaseIndex: number,
+                        level: number,
+                        verticeIndex
+                    ) =>
+                        lookupTableCaseIndex +
+                        (level > 0 ? Math.pow(2, verticeIndex) : 0),
                     0
                 )
             ];
+
         const vertices: FloatArray = [];
         faces.forEach((edges) =>
             edges.map((edge) => {
-                const [v0, v1] = EDGES[edge];
-                const f0 = levelFunctionResult[v0];
-                const f1 = levelFunctionResult[v1];
-                const t0 = 1 - (0 - f0) / (f1 - f0);
+                const [vertex0, vertex1] = EDGES[edge];
+                const levelFunctionResultForVertex0 =
+                    levelFunctionResult[vertex0];
+                const levelFunctionResultForVertex1 =
+                    levelFunctionResult[vertex1];
+                // Linear interpolation used to decide where exactly along the edge the surface should be drawn
+                const t0 =
+                    1 +
+                    levelFunctionResultForVertex0 /
+                        (levelFunctionResultForVertex1 -
+                            levelFunctionResultForVertex0);
                 const t1 = 1 - t0;
-                const vert_pos0 = VERTICES[v0];
-                const vert_pos1 = VERTICES[v1];
+                const vertex0Coordinates = VERTICES[vertex0];
+                const vertex1Coordinates = VERTICES[vertex1];
                 vertices.push(
-                    ...[
-                        x + vert_pos0[0] * t0 + vert_pos1[0] * t1,
-                        y + vert_pos0[1] * t0 + vert_pos1[1] * t1,
-                        z + vert_pos0[2] * t0 + vert_pos1[2] * t1,
-                    ]
+                    x + vertex0Coordinates[0] * t0 + vertex1Coordinates[0] * t1,
+                    y + vertex0Coordinates[1] * t0 + vertex1Coordinates[1] * t1,
+                    z + vertex0Coordinates[2] * t0 + vertex1Coordinates[2] * t1
                 );
             })
         );

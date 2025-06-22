@@ -1,3 +1,4 @@
+// Coordinates of the 8 vertices (corners) of a cube
 // Vertices need to be evaluated counterclockwise, otherwise the mesh might be rendered inside out
 export const VERTICES = [
     [0, 0, 0],

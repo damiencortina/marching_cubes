@@ -1,3 +1,4 @@
+// Representation of the 12 edges of a cube
 export const EDGES = [
     [0, 1],
     [1, 2],
