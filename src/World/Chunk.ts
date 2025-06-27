@@ -5,4 +5,5 @@ export interface Chunk {
     coordinates: Vector3;
 
     render(): Mesh;
+    remove(): void;
 }

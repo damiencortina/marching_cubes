@@ -7,41 +7,31 @@ import {
 } from "@babylonjs/core";
 import type { Chunk } from "./Chunk";
 import type { Subject } from "../Subject";
-import { CharacterController } from "../CharacterController";
 import type { Observer } from "../Observer";
 import { Utils } from "../Utils";
+import { Config } from "../Config";
+import { Character } from "../Character";
 
 export abstract class WorldFactory implements Observer {
-    chunkSize: number;
-    distanceView: number;
     scene: Scene;
     displayedChunks: Record<string, Chunk> = {};
 
-    constructor(chunkSize: number, distanceView: number, scene: Scene) {
-        this.chunkSize = chunkSize;
-        this.distanceView = distanceView;
+    constructor(scene: Scene) {
         this.scene = scene;
         new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
     }
 
     abstract createChunk(coordinates: Vector3): Chunk;
 
-    generateworld() {
-        const origin = new Vector3(0, 0, 0);
-        const chunk = this.createChunk(origin);
-        this.displayedChunks[origin.toString()] = chunk;
-        chunk.render();
-        this.generateNearbyChunks(chunk);
-    }
-
-    generateNearbyChunks(chunk: Chunk) {
+    generateworld(chunkCoordinates: Vector3) {
+        const neededChunks: Record<string, Chunk> = {};
         Utils.range(
-            chunk.coordinates.x - this.distanceView,
-            chunk.coordinates.x + this.distanceView
+            chunkCoordinates.x - Config.distanceView,
+            chunkCoordinates.x + Config.distanceView
         ).forEach((x) => {
             Utils.range(
-                chunk.coordinates.z - this.distanceView,
-                chunk.coordinates.z + this.distanceView
+                chunkCoordinates.z - Config.distanceView,
+                chunkCoordinates.z + Config.distanceView
             ).forEach((z) => {
                 const coordinates = new Vector3(x, 0, z);
                 const index = coordinates.toString();
@@ -54,15 +44,22 @@ export abstract class WorldFactory implements Observer {
                     blueMat.emissiveColor = new Color3(0, 0, 1);
                     chunkMesh.material = blueMat;
                 }
+                neededChunks[index] = this.displayedChunks[index];
             });
         });
+        // const chunksToRemove = Object.values(this.displayedChunks).filter(
+        //     (chunk: Chunk, index: number) => neededChunks[index] === undefined
+        // );
+        // chunksToRemove.forEach((chunk: Chunk) => chunk.remove());
+        // this.displayedChunks = neededChunks;
     }
 
     update(subject: Subject): void {
-        if (subject instanceof CharacterController) {
+        if (subject instanceof Character) {
             console.log(
                 "WorldBuilder has been notified by CharacterController."
             );
+            //this.generateworld(subject.chunkCoordinates);
         }
     }
 }

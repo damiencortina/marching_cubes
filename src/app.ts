@@ -4,8 +4,12 @@ import { Engine, Scene, Vector3, HavokPlugin } from "@babylonjs/core";
 import { CharacterController } from "./CharacterController";
 import HavokPhysics from "@babylonjs/havok";
 import { StandardMarchingCubesWorld } from "./World/World/StandardMarchingCubesWorld";
+import { Character } from "./Character";
+import { Config } from "./Config";
 
 class App {
+    #chunkSize = 20;
+
     constructor() {
         // create the canvas html element and attach it to the webpage
         const canvas = document.createElement("canvas");
@@ -39,10 +43,11 @@ class App {
         const havokInstance = await HavokPhysics();
         const hk = new HavokPlugin(true, havokInstance);
         scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-        const worldBuilder = new StandardMarchingCubesWorld(20, 2, scene);
-        worldBuilder.generateworld();
-        const characterController = new CharacterController(scene);
-        characterController.attach(worldBuilder);
+        const worldBuilder = new StandardMarchingCubesWorld(scene);
+        worldBuilder.generateworld(Config.startingCoordinates);
+        const player = new Character();
+        new CharacterController(player, scene);
+        player.attach(worldBuilder);
 
         // run the main render loop
         engine.runRenderLoop(() => {

@@ -10,10 +10,9 @@ import {
     type CharacterSurfaceInfo,
     type Scene,
 } from "@babylonjs/core";
-import type { Observer } from "./Observer";
-import type { Subject } from "./Subject";
+import { Character } from "./Character";
 
-export class CharacterController implements Subject {
+export class CharacterController {
     // Player/Character state
     #state = "IN_AIR";
     #inAirSpeed = 8.0;
@@ -25,8 +24,10 @@ export class CharacterController implements Subject {
     #characterOrientation = Quaternion.Identity();
     #characterGravity = new Vector3(0, -18, 0);
     #characterController: PhysicsCharacterController;
+    #player: Character;
 
-    constructor(scene: Scene) {
+    constructor(player: Character, scene: Scene) {
+        this.#player = player;
         // This creates and positions a free camera (non-mesh)
         const camera = new FreeCamera("camera1", new Vector3(0, 5, -5), scene);
 
@@ -176,6 +177,7 @@ export class CharacterController implements Subject {
                     }
                     break;
             }
+            this.#player.moveTo(this.#characterController.getPosition());
         });
     }
 
@@ -295,45 +297,5 @@ export class CharacterController implements Subject {
             return currentVelocity.add(upWorld.scale(u - curRelVel));
         }
         return Vector3.Zero();
-    }
-
-    /**
-     * @type {Observer[]} List of subscribers. In real life, the list of
-     * subscribers can be stored more comprehensively (categorized by event
-     * type, etc.).
-     */
-    private observers: Observer[] = [];
-
-    /**
-     * The subscription management methods.
-     */
-    public attach(observer: Observer): void {
-        const isExist = this.observers.includes(observer);
-        if (isExist) {
-            return console.log("Subject: Observer has been attached already.");
-        }
-
-        console.log("Subject: Attached an observer.");
-        this.observers.push(observer);
-    }
-
-    public detach(observer: Observer): void {
-        const observerIndex = this.observers.indexOf(observer);
-        if (observerIndex === -1) {
-            return console.log("Subject: Nonexistent observer.");
-        }
-
-        this.observers.splice(observerIndex, 1);
-        console.log("Subject: Detached an observer.");
-    }
-
-    /**
-     * Trigger an update in each subscriber.
-     */
-    public notify(): void {
-        console.log("Subject: Notifying observers...");
-        for (const observer of this.observers) {
-            observer.update(this);
-        }
     }
 }

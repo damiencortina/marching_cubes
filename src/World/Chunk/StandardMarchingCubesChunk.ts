@@ -10,14 +10,14 @@ import {
 } from "@babylonjs/core";
 import { MarchingCubeGenerator } from "../../marching_cubes/MarchingCubeGenerator";
 import type { Chunk } from "../Chunk";
+import { Config } from "../../Config";
 
 export class StandardMarchingCubesChunk implements Chunk {
     scene: Scene;
     coordinates: Vector3;
-    size: number;
+    mesh: Mesh | undefined;
 
-    constructor(size: number, coordinates: Vector3, scene: Scene) {
-        this.size = size;
+    constructor(coordinates: Vector3, scene: Scene) {
         this.scene = scene;
         this.coordinates = coordinates;
     }
@@ -25,13 +25,20 @@ export class StandardMarchingCubesChunk implements Chunk {
     render(): Mesh {
         const noise = new FastNoiseLite();
         noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        const marchingCubeGenerator = new MarchingCubeGenerator(this.size);
+        const marchingCubeGenerator = new MarchingCubeGenerator(
+            Config.chunkSize
+        );
         const mesh = marchingCubeGenerator.marchingCubes3d(
             (x: number, y: number, z: number) => noise.GetNoise(x, z) * 10 - y,
             this.scene,
             this.coordinates
         );
         new PhysicsAggregate(mesh, PhysicsShapeType.MESH);
+        this.mesh = mesh;
         return mesh;
+    }
+
+    remove(): void {
+        this.mesh?.dispose();
     }
 }
