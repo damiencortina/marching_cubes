@@ -39,7 +39,7 @@ export class CharacterController {
             { height: h, radius: r },
             scene
         );
-        const characterPosition = new Vector3(0, 50, 0);
+        const characterPosition = new Vector3(0, 20, 0);
         this.#characterController = new PhysicsCharacterController(
             characterPosition,
             { capsuleHeight: h, capsuleRadius: r },

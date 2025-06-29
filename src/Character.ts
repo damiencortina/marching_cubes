@@ -8,11 +8,14 @@ export class Character implements Subject {
 
     public moveTo(coordinates: Vector3) {
         const chunkCoordinates = new Vector3(
-            Math.floor(coordinates.x / Config.chunkSize),
+            Math.floor(
+                (coordinates.x + Config.chunkSize / 2) / Config.chunkSize
+            ),
             0,
-            Math.floor(coordinates.z / Config.chunkSize)
+            Math.floor(
+                (coordinates.z + Config.chunkSize / 2) / Config.chunkSize
+            )
         );
-        console.log(chunkCoordinates);
         if (
             chunkCoordinates.x !== this.chunkCoordinates.x ||
             chunkCoordinates.z !== this.chunkCoordinates.z
