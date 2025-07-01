@@ -6,9 +6,10 @@ import { Utils } from "../Utils";
 import { Config } from "../Config";
 import { Character } from "../Character";
 
+type ChunkDictionnary = Record<string, Chunk>;
 export abstract class WorldFactory implements Observer {
     scene: Scene;
-    displayedChunks: Record<string, Chunk> = {};
+    displayedChunks: ChunkDictionnary = {};
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -18,7 +19,7 @@ export abstract class WorldFactory implements Observer {
     abstract createChunk(coordinates: Vector3): Chunk;
 
     generateworld(chunkCoordinates: Vector3) {
-        //const neededChunks: Record<string, Chunk> = {};
+        const newChunks: ChunkDictionnary = {};
         Utils.range(
             chunkCoordinates.x - Config.distanceView,
             chunkCoordinates.x + Config.distanceView
@@ -31,17 +32,20 @@ export abstract class WorldFactory implements Observer {
                 const index = coordinates.toString();
                 if (!this.displayedChunks[index]) {
                     const chunk = this.createChunk(coordinates);
-                    this.displayedChunks[index] = chunk;
                     chunk.render();
+                    newChunks[index] = chunk;
+                } else {
+                    newChunks[index] = this.displayedChunks[index];
                 }
-                //neededChunks[index] = this.displayedChunks[index];
             });
         });
-        // const chunksToRemove = Object.values(this.displayedChunks).filter(
-        //     (chunk: Chunk, index: number) => neededChunks[index] === undefined
-        // );
-        // chunksToRemove.forEach((chunk: Chunk) => chunk.remove());
-        // this.displayedChunks = neededChunks;
+        Object.values(this.displayedChunks).forEach((chunk: Chunk) => {
+            if (!newChunks[chunk.coordinates.toString()]) {
+                chunk.remove();
+            }
+        });
+
+        this.displayedChunks = newChunks;
     }
 
     update(subject: Subject): void {
