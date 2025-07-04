@@ -99,6 +99,8 @@ export class CharacterController {
                 support,
                 this.#characterGravity
             );
+            // Not sure this is the best place to do this, but doing it in scene.onKeyboardObservable stops working a few seconds after the button is pressed
+            this.#player.moveTo(this.#characterController.getPosition());
         });
 
         // Rotate camera
@@ -177,7 +179,6 @@ export class CharacterController {
                     }
                     break;
             }
-            this.#player.moveTo(this.#characterController.getPosition());
         });
     }
 
