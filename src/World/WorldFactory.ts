@@ -10,6 +10,7 @@ export abstract class WorldFactory implements Observer {
     scene: Scene;
     displayedChunks: Chunk[][] = [];
     currentCoordinates: Vector3 | undefined;
+    chunksToRender: Chunk[] = [];
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -60,7 +61,7 @@ export abstract class WorldFactory implements Observer {
                         zCoordinate
                     )
                 );
-                chunk.render();
+                this.chunksToRender.push(chunk);
                 chunkLine.push(chunk);
             });
             this.displayedChunks
@@ -83,7 +84,7 @@ export abstract class WorldFactory implements Observer {
                             movementVector.z * Config.distanceView
                     )
                 );
-                chunk.render();
+                this.chunksToRender.push(chunk);
                 const newChunkLine = chunkLine;
                 newChunkLine
                     .splice((movementVector.z - 1) / 2, 1)

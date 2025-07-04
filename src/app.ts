@@ -8,7 +8,6 @@ import { Character } from "./Character";
 import { Config } from "./Config";
 
 class App {
-    #chunkSize = 20;
 
     constructor() {
         // create the canvas html element and attach it to the webpage
@@ -52,6 +51,9 @@ class App {
         // run the main render loop
         engine.runRenderLoop(() => {
             scene.render();
+            if(worldBuilder.chunksToRender.length){
+                worldBuilder.chunksToRender.shift()?.render();
+            }
         });
     }
 }
