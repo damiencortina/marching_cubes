@@ -1,9 +1,6 @@
-import type { Vector3 } from "@babylonjs/core";
 import type { Observer } from "./Observer";
 
 export interface Subject {
-    chunkCoordinates: Vector3;
-
     // Attach an observer to the subject.
     attach(observer: Observer): void;
 

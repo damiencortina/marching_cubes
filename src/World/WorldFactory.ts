@@ -1,6 +1,5 @@
 import { HemisphericLight, Vector3, type Scene } from "@babylonjs/core";
 import type { Chunk } from "./Chunk";
-import type { Subject } from "../Subject";
 import type { Observer } from "../Observer";
 import { Utils } from "../Utils";
 import { Config } from "../Config";
@@ -9,41 +8,35 @@ import { Character } from "../Character";
 export abstract class WorldFactory implements Observer {
     scene: Scene;
     displayedChunks: Chunk[][] = [];
-    currentCoordinates: Vector3 | undefined;
+    currentCoordinates: Vector3;
     chunksToRender: Chunk[] = [];
 
-    constructor(scene: Scene) {
+    constructor(coordinates: Vector3, scene: Scene) {
         this.scene = scene;
         new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
-        //this.displayedChunks = Array(Config.distanceView * 2 + 1);
+        const xRange = Utils.range(
+            coordinates.x - Config.distanceView,
+            coordinates.x + Config.distanceView
+        );
+        xRange.forEach((x) => {
+            const chunkLine: Chunk[] = [];
+            Utils.range(
+                coordinates.z - Config.distanceView,
+                coordinates.z + Config.distanceView
+            ).forEach((z) => {
+                const coordinates = new Vector3(x, 0, z);
+                const chunk = this.createChunk(coordinates);
+                chunk.render();
+                chunkLine.push(chunk);
+            });
+            this.displayedChunks.push(chunkLine);
+        });
+        this.currentCoordinates = coordinates;
     }
 
     abstract createChunk(coordinates: Vector3): Chunk;
 
-    generateworld(chunkCoordinates: Vector3) {
-        if (!this.currentCoordinates) {
-            const xRange = Utils.range(
-                chunkCoordinates.x - Config.distanceView,
-                chunkCoordinates.x + Config.distanceView
-            );
-            //const worldSize = xRange.length;
-            xRange.forEach((x) => {
-                // const chunkLine: Chunk[] = Array(worldSize);
-                const chunkLine: Chunk[] = [];
-                Utils.range(
-                    chunkCoordinates.z - Config.distanceView,
-                    chunkCoordinates.z + Config.distanceView
-                ).forEach((z) => {
-                    const coordinates = new Vector3(x, 0, z);
-                    const chunk = this.createChunk(coordinates);
-                    chunk.render();
-                    chunkLine.push(chunk);
-                });
-                this.displayedChunks.push(chunkLine);
-            });
-            this.currentCoordinates = chunkCoordinates;
-            return;
-        }
+    #updateWorld(chunkCoordinates: Vector3) {
         const movementVector = chunkCoordinates.subtract(
             this.currentCoordinates
         );
@@ -101,12 +94,12 @@ export abstract class WorldFactory implements Observer {
         this.currentCoordinates = chunkCoordinates;
     }
 
-    update(subject: Subject): void {
-        if (subject instanceof Character) {
+    update(character: Character): void {
+        if (character instanceof Character) {
             console.log(
                 "WorldBuilder has been notified by CharacterController."
             );
-            this.generateworld(subject.chunkCoordinates);
+            this.#updateWorld(character.chunkCoordinates);
         }
     }
 }

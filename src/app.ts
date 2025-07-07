@@ -8,7 +8,6 @@ import { Character } from "./Character";
 import { Config } from "./Config";
 
 class App {
-
     constructor() {
         // create the canvas html element and attach it to the webpage
         const canvas = document.createElement("canvas");
@@ -42,8 +41,10 @@ class App {
         const havokInstance = await HavokPhysics();
         const hk = new HavokPlugin(true, havokInstance);
         scene.enablePhysics(new Vector3(0, -9.8, 0), hk);
-        const worldBuilder = new StandardMarchingCubesWorld(scene);
-        worldBuilder.generateworld(Config.startingCoordinates);
+        const worldBuilder = new StandardMarchingCubesWorld(
+            Config.startingCoordinates,
+            scene
+        );
         const player = new Character();
         new CharacterController(player, scene);
         player.attach(worldBuilder);
@@ -51,7 +52,7 @@ class App {
         // run the main render loop
         engine.runRenderLoop(() => {
             scene.render();
-            if(worldBuilder.chunksToRender.length){
+            if (worldBuilder.chunksToRender.length) {
                 worldBuilder.chunksToRender.shift()?.render();
             }
         });
