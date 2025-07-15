@@ -1,14 +1,8 @@
-import {
-    Mesh,
-    Scene,
-    Vector3,
-    VertexData,
-    type FloatArray,
-} from "@babylonjs/core";
+import { type FloatArray } from "@babylonjs/core";
 import { LOOKUP_TABLE } from "./marching_cubes_consts/lookupTable";
 import { EDGES } from "./marching_cubes_consts/edges";
 import { VERTICES } from "./marching_cubes_consts/vertices";
-import { Utils } from "../Utils";
+import { Utils, type ChunkCoordinates } from "../Utils";
 
 type LevelFunction = (x: number, y: number, z: number) => number;
 
@@ -70,9 +64,8 @@ export class MarchingCubeGenerator {
 
     marchingCubes3d(
         levelFunction: LevelFunction,
-        scene: Scene,
-        chunkCoordinates: Vector3
-    ) {
+        chunkCoordinates: ChunkCoordinates
+    ): number[] {
         const halfChunkSize = this.chunkSize / 2;
         const xmin = chunkCoordinates.x * this.chunkSize - halfChunkSize;
         const xmax = chunkCoordinates.x * this.chunkSize + halfChunkSize;
@@ -115,15 +108,6 @@ export class MarchingCubeGenerator {
                 });
             });
         });
-        const vertexData = new VertexData();
-        vertexData.positions = positions;
-        if (vertexData.positions) {
-            vertexData.indices = [
-                ...Array(vertexData.positions.length / 3).keys(),
-            ];
-        }
-        const mesh = new Mesh("custom", scene);
-        vertexData.applyToMesh(mesh);
-        return mesh;
+        return positions;
     }
 }

@@ -52,9 +52,6 @@ class App {
         // run the main render loop
         engine.runRenderLoop(() => {
             scene.render();
-            if (worldBuilder.chunksToRender.length) {
-                worldBuilder.chunksToRender.shift()?.render();
-            }
         });
     }
 }

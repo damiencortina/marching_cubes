@@ -29,17 +29,17 @@ export class CharacterController {
     constructor(player: Character, scene: Scene) {
         this.#player = player;
         // This creates and positions a free camera (non-mesh)
-        const camera = new FreeCamera("camera1", new Vector3(0, 5, -5), scene);
+        const camera = new FreeCamera("camera1", new Vector3(0, 21, -5), scene);
 
         // Physics shape for the character
-        const h = 1.8;
-        const r = 0.6;
+        const h = 2;
+        const r = 0.5;
         const displayCapsule = MeshBuilder.CreateCapsule(
             "CharacterDisplay",
             { height: h, radius: r },
             scene
         );
-        const characterPosition = new Vector3(0, 20, 0);
+        const characterPosition = new Vector3(0, 21, 0);
         this.#characterController = new PhysicsCharacterController(
             characterPosition,
             { capsuleHeight: h, capsuleRadius: r },
