@@ -10,7 +10,6 @@ noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
 const marchingCubeGenerator = new MarchingCubeGenerator(Config.chunkSize);
 
 onmessage = (event: MessageEvent<ChunkCoordinates>) => {
-    console.log("Message received from main script");
     const chunkData = {
         coordinates: event.data,
         vertices: marchingCubeGenerator.marchingCubes3d(
@@ -18,6 +17,5 @@ onmessage = (event: MessageEvent<ChunkCoordinates>) => {
             event.data
         ),
     };
-    console.log("Posting message back to main script");
     postMessage(chunkData);
 };

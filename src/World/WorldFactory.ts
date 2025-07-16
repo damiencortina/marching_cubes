@@ -103,23 +103,18 @@ export abstract class WorldFactory implements Observer {
         const movementVector = chunkCoordinates.subtract(
             this.currentCoordinates
         );
-        const toto = new Vector3(1, 1, 1).subtract(movementVector);
         Utils.range(-Config.distanceView, Config.distanceView).forEach(
             (chunkIndex) => {
                 this.chunkWorker.postMessage({
                     x:
                         chunkCoordinates.x +
-                        movementVector.x *
-                            Config.distanceView *
-                            movementVector.x +
-                        toto.x * chunkIndex,
+                        movementVector.x * Config.distanceView +
+                        (movementVector.x === 0 ? 1 : 0) * chunkIndex,
                     y: 0,
                     z:
                         chunkCoordinates.z +
-                        movementVector.z *
-                            Config.distanceView *
-                            movementVector.z +
-                        toto.z * chunkIndex,
+                        movementVector.z * Config.distanceView +
+                        (movementVector.z === 0 ? 1 : 0) * chunkIndex,
                 });
             }
         );
