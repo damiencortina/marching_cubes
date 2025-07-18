@@ -2,6 +2,7 @@ import {
     Mesh,
     PhysicsAggregate,
     PhysicsShapeType,
+    StandardMaterial,
     Vector3,
     VertexData,
     type Scene,
@@ -12,7 +13,12 @@ export class StandardMarchingCubesChunk implements Chunk {
     coordinates: Vector3;
     mesh: Mesh | undefined;
 
-    constructor(coordinates: Vector3, positions: number[], scene: Scene) {
+    constructor(
+        coordinates: Vector3,
+        positions: number[],
+        material: StandardMaterial,
+        scene: Scene
+    ) {
         this.coordinates = coordinates;
         const vertexData = new VertexData();
         vertexData.positions = positions;
@@ -24,6 +30,7 @@ export class StandardMarchingCubesChunk implements Chunk {
         const mesh = new Mesh("custom", scene);
         vertexData.applyToMesh(mesh);
         new PhysicsAggregate(mesh, PhysicsShapeType.MESH);
+        mesh.material = material;
         this.mesh = mesh;
     }
 

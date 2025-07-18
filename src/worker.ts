@@ -7,6 +7,7 @@ import type { ChunkCoordinates } from "./Utils";
 
 const noise = new FastNoiseLite();
 noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+noise.SetFractalType(FastNoiseLite.FractalType.FBm);
 const marchingCubeGenerator = new MarchingCubeGenerator(Config.chunkSize);
 
 onmessage = (event: MessageEvent<ChunkCoordinates>) => {

@@ -1,10 +1,12 @@
 import {
+    Color3,
     HemisphericLight,
     MeshBuilder,
     PhysicsAggregate,
     PhysicsShapeType,
+    Scene,
+    StandardMaterial,
     Vector3,
-    type Scene,
 } from "@babylonjs/core";
 import type { Chunk } from "./Chunk";
 import type { Observer } from "../Observer";
@@ -21,7 +23,13 @@ export abstract class WorldFactory implements Observer {
 
     constructor(coordinates: Vector3, scene: Scene) {
         this.scene = scene;
-        new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
+        const light = new HemisphericLight(
+            "light1",
+            new Vector3(1, 1, 0),
+            scene
+        );
+        light.specular = new Color3(1, 0.5, 1);
+        light.groundColor = new Color3(0.5, 0, 1);
 
         // create a worker (for chunks compuations)
         const chunkWorker = new Worker(
@@ -30,10 +38,19 @@ export abstract class WorldFactory implements Observer {
                 type: "module",
             }
         );
+        scene.clearColor = Config.skyColor.toColor4();
+        scene.fogMode = Scene.FOGMODE_LINEAR;
+        scene.fogStart = Config.chunkSize * (Config.distanceView - 1);
+        scene.fogEnd = Config.chunkSize * Config.distanceView;
+        scene.fogColor = Config.skyColor;
+
+        const groundMaterial = new StandardMaterial("groundMaterial", scene);
+        groundMaterial.diffuseColor = new Color3(1, 0, 0.5);
         chunkWorker.onmessage = (event: MessageEvent<ChunkData>) => {
             const chunk = this.createChunk(
                 new Vector3(...Object.values(event.data.coordinates)),
-                event.data.vertices
+                event.data.vertices,
+                groundMaterial
             );
             this.displayedChunks.push(chunk);
         };
@@ -54,18 +71,25 @@ export abstract class WorldFactory implements Observer {
             });
         });
 
-        // TODO : install a platorm for the player to start on
+        // Create a box for the character to stand on (until i figure out a way to know for sure what the groundś height will be at the starting coordinates)
         const box = MeshBuilder.CreateBox(
             "box",
             { height: 40, width: 5, depth: 5 },
             scene
         );
+        const boxMaterial = new StandardMaterial("boxMaterial", scene);
+        boxMaterial.diffuseColor = new Color3(0.4, 0.4, 0.4);
+        box.material = boxMaterial;
         new PhysicsAggregate(box, PhysicsShapeType.MESH);
 
         this.currentCoordinates = coordinates;
     }
 
-    abstract createChunk(coordinates: Vector3, positions: number[]): Chunk;
+    abstract createChunk(
+        coordinates: Vector3,
+        positions: number[],
+        material: StandardMaterial
+    ): Chunk;
 
     #updateWorld(chunkCoordinates: Vector3) {
         // Chunk removal
