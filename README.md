@@ -25,3 +25,11 @@ Once clonned, open it in vscode, use `CTRL+Shift+P` and search for **Reopen in c
 npm i
 npm run dev
 ```
+
+## Controls
+
+Move with `w`,`a`,`s`,`d` or the `arrow keys`.
+
+Look arround by clicking and dragging the mouse.
+
+**Wait for the ground to generate before jumping from the starting platform** (I should had a loader someday)
